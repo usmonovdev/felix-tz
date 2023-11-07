@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  Button,
-  Paper,
-  Typography,
-  TextField,
-} from "@mui/material";
+import { Button, Paper, Typography, TextField } from "@mui/material";
 import {
   DividerForUserRegister,
   FormForUserRegister,
@@ -14,14 +9,23 @@ import {
 import { IconFacebook, IconGoogle } from "../icons";
 import { LoadingButton } from "@mui/lab";
 import { useFormik } from "formik";
+import { useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 import * as Yup from "yup";
+import axios from "../utils/axios.config";
+import { registerUserError, registerUserStart, registerUserSuccess } from "../store/user-slice";
 
 const CreateAccount = () => {
+  const dispatch = useDispatch()
+  const { loading } = useSelector((state) => state);
+  console.log("create", loading);
+  const navigate = useNavigate();
   const formik = useFormik({
     initialValues: {
       name: "",
       email: "",
       username: "",
+      password: "",
     },
     validationSchema: Yup.object({
       name: Yup.string()
@@ -33,11 +37,31 @@ const CreateAccount = () => {
         .required("Username is required")
         .min(4, "Min length is 4")
         .max(20, "Max lenght is 20"),
+      password: Yup.string()
+        .required("Password is required")
+        .min(8, "Min length is 8")
+        .max(20, "Max lenght is 20"),
     }),
     onSubmit: async (values, helpers) => {
+      dispatch(registerUserStart())
       try {
-        console.log(values);
-      } catch (error) {}
+        const { data } = await axios.post("/signup", {
+          name: values.name,
+          email: values.email,
+          key: values.username,
+          secret: values.password
+        });
+        if (data.isOk == true) {
+          dispatch(registerUserSuccess(data.data))
+          localStorage.setItem("isLoggedIn", true)
+          navigate('/')
+        }
+      } catch (error) {
+        helpers.setStatus({ success: false });
+        helpers.setErrors({ submit: err.message });
+        helpers.setSubmitting(false);
+        dispatch(registerUserError())
+      }
     },
   });
 
@@ -46,7 +70,7 @@ const CreateAccount = () => {
       <Paper
         sx={{
           width: "430px",
-          padding: "48px 28px",
+          padding: "35px 28px",
           borderRadius: "12px",
           display: "flex",
           flexDirection: "column",
@@ -59,7 +83,7 @@ const CreateAccount = () => {
         <Button
           variant="outlined"
           color="secondary"
-          sx={{ marginTop: "20px" }}
+          sx={{ marginTop: "10px" }}
           fullWidth
           startIcon={<IconGoogle />}
         >
@@ -102,13 +126,29 @@ const CreateAccount = () => {
             onChange={formik.handleChange}
             required
           />
-          <LoadingButton variant="contained" type="submit" sx={{ marginTop: "20px" }}>
+          <TextField
+            id="password"
+            label="Your Password"
+            helperText={formik.touched.password && formik.errors.password}
+            error={!!(formik.touched.password && formik.errors.password)}
+            onBlur={formik.handleBlur}
+            onChange={formik.handleChange}
+            required
+          />
+          <LoadingButton
+            variant="contained"
+            type="submit"
+            loading={loading}
+            sx={{ marginTop: "20px" }}
+          >
             Create Account
           </LoadingButton>
         </FormForUserRegister>
         <Typography textAlign={"center"}>
           Already signed up?{" "}
-          <SpanForUserRegister>Go to sign in.</SpanForUserRegister>
+          <SpanForUserRegister onClick={() => navigate("/auth/login")}>
+            Go to sign in.
+          </SpanForUserRegister>
         </Typography>
       </Paper>
     </MainTagForUserRegister>
