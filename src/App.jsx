@@ -1,9 +1,10 @@
 import { ThemeProvider } from "@mui/material/styles";
-import { Routes, Route, Navigate, Outlet } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { CreateAccount, Home, NotFound, SignIn } from "./pages";
-import { useEffect } from "react";
+import { useSelector } from 'react-redux'
 import Theme from "./theme";
 
+// protected route
 const ProtectedRoute = ({
   isAllowed,
   redirectPath = "/auth/login",
@@ -16,9 +17,7 @@ const ProtectedRoute = ({
 };
 
 function App() {
-  const isLoggedIn = localStorage.getItem("isLoggedIn");
-  useEffect(() => {}, [isLoggedIn]);
-
+  const { isLoggedIn } = useSelector((state) => state)
   return (
     <ThemeProvider theme={Theme}>
       <Routes>

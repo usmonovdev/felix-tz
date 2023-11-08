@@ -13,25 +13,23 @@ import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import * as Yup from "yup";
 import axios from "../utils/axios.config";
-import { registerUserError, registerUserStart, registerUserSuccess } from "../store/user-slice";
+import {
+  loginUserError,
+  loginUserStart,
+  loginUserSuccess
+} from "../store/user-slice";
+import md5 from "md5";
 
 const SignIn = () => {
-  const dispatch = useDispatch()
-  const { loading } = useSelector((state) => state);
+  const dispatch = useDispatch();
+  const { loading, error } = useSelector((state) => state);
   const navigate = useNavigate();
   const formik = useFormik({
     initialValues: {
-      name: "",
-      email: "",
       username: "",
       password: "",
     },
     validationSchema: Yup.object({
-      name: Yup.string()
-        .required("Name is required")
-        .min(3, "Min length is 3")
-        .max(20, "Max length is 20"),
-      email: Yup.string().required("Email is required").email("Invalid Email"),
       username: Yup.string()
         .required("Username is required")
         .min(4, "Min length is 4")
@@ -42,24 +40,27 @@ const SignIn = () => {
         .max(20, "Max lenght is 20"),
     }),
     onSubmit: async (values, helpers) => {
-      dispatch(registerUserStart())
+      dispatch(loginUserStart());
+      const method = "GET";
+      const key = values.username;
+      const secret = values.password;
+      const url = "/myself";
+      const stringToSign = `${method}${url}${secret}`;
+      const sign = md5(stringToSign);
       try {
-        const { data } = await axios.post("/signup", {
-          name: values.name,
-          email: values.email,
-          key: values.username,
-          secret: values.password
+        const { data } = await axios.get("/myself", {
+          headers: {
+            Key: key,
+            Sign: sign,
+          },
         });
         if (data.isOk == true) {
-          dispatch(registerUserSuccess(data))
-          localStorage.setItem("isLoggedIn", true)
-          navigate('/')
+          dispatch(loginUserSuccess(data.data));
+          navigate("/");
+          helpers.resetForm();
         }
       } catch (error) {
-        helpers.setStatus({ success: false });
-        helpers.setErrors({ submit: err.message });
-        helpers.setSubmitting(false);
-        dispatch(registerUserError())
+        dispatch(loginUserError(error.response.data.message));
       }
     },
   });
@@ -77,7 +78,7 @@ const SignIn = () => {
         }}
       >
         <Typography variant="h1" textAlign={"center"}>
-          Sign In
+          Login
         </Typography>
         <Button
           variant="outlined"
@@ -99,24 +100,6 @@ const SignIn = () => {
         <DividerForUserRegister>OR</DividerForUserRegister>
         <FormForUserRegister noValidate onSubmit={formik.handleSubmit}>
           <TextField
-            id="name"
-            label="Your Name"
-            helperText={formik.touched.name && formik.errors.name}
-            error={!!(formik.touched.name && formik.errors.name)}
-            onBlur={formik.handleBlur}
-            onChange={formik.handleChange}
-            required
-          />
-          <TextField
-            id="email"
-            label="Your Email"
-            helperText={formik.touched.email && formik.errors.email}
-            error={!!(formik.touched.email && formik.errors.email)}
-            onBlur={formik.handleBlur}
-            onChange={formik.handleChange}
-            required
-          />
-          <TextField
             id="username"
             label="Your Username"
             helperText={formik.touched.username && formik.errors.username}
@@ -134,6 +117,15 @@ const SignIn = () => {
             onChange={formik.handleChange}
             required
           />
+          {error && (
+            <Typography
+              variant="caption"
+              color={"error.main"}
+              textAlign={"center"}
+            >
+              {error}
+            </Typography>
+          )}
           <LoadingButton
             variant="contained"
             type="submit"
@@ -146,7 +138,7 @@ const SignIn = () => {
         <Typography textAlign={"center"}>
           Already signed up?{" "}
           <SpanForUserRegister onClick={() => navigate("/auth/register")}>
-            Go to register
+            Go to Register.
           </SpanForUserRegister>
         </Typography>
       </Paper>

@@ -6,7 +6,7 @@ export const userSlice = createSlice({
     loading: false,
     error: null,
     user: [],
-    isLoggedIn: false
+    isLoggedIn: JSON.parse(localStorage.getItem('isLoggedIn')) || false
   },
   reducers: {
     registerUserStart: (state, action) => {
@@ -15,8 +15,11 @@ export const userSlice = createSlice({
     registerUserSuccess: (state, action) => {
       state.loading = false
       state.user = action.payload
-      // localStorage.setItem("user", action.payload.secret)
+      localStorage.setItem("isLoggedIn", true)
+      localStorage.setItem("secret", action.payload.secret)
+      localStorage.setItem("key", action.payload.key)
       state.isLoggedIn = true
+      state.error = null
     },
     registerUserError: (state, action) => {
       state.loading = false
@@ -29,7 +32,11 @@ export const userSlice = createSlice({
     loginUserSuccess: (state, action) => {
       state.loading = false
       state.user = action.payload
+      localStorage.setItem("isLoggedIn", true)
+      localStorage.setItem("secret", action.payload.secret)
+      localStorage.setItem("key", action.payload.key)
       state.isLoggedIn = true
+      state.error = null
     },
     loginUserError: (state, action) => {
       state.loading = false

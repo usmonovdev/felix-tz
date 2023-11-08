@@ -13,12 +13,15 @@ import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import * as Yup from "yup";
 import axios from "../utils/axios.config";
-import { registerUserError, registerUserStart, registerUserSuccess } from "../store/user-slice";
+import {
+  registerUserError,
+  registerUserStart,
+  registerUserSuccess,
+} from "../store/user-slice";
 
 const CreateAccount = () => {
-  const dispatch = useDispatch()
-  const { loading } = useSelector((state) => state);
-  console.log("create", loading);
+  const dispatch = useDispatch();
+  const { loading, error } = useSelector((state) => state);
   const navigate = useNavigate();
   const formik = useFormik({
     initialValues: {
@@ -39,28 +42,25 @@ const CreateAccount = () => {
         .max(20, "Max lenght is 20"),
       password: Yup.string()
         .required("Password is required")
-        .min(8, "Min length is 8")
+        .min(4, "Min length is 4")
         .max(20, "Max lenght is 20"),
     }),
     onSubmit: async (values, helpers) => {
-      dispatch(registerUserStart())
+      dispatch(registerUserStart());
       try {
         const { data } = await axios.post("/signup", {
           name: values.name,
           email: values.email,
           key: values.username,
-          secret: values.password
+          secret: values.password,
         });
         if (data.isOk == true) {
-          dispatch(registerUserSuccess(data.data))
-          localStorage.setItem("isLoggedIn", true)
-          navigate('/')
+          dispatch(registerUserSuccess(data.data));
+          navigate("/");
+          helpers.resetForm();
         }
       } catch (error) {
-        helpers.setStatus({ success: false });
-        helpers.setErrors({ submit: err.message });
-        helpers.setSubmitting(false);
-        dispatch(registerUserError())
+        dispatch(registerUserError(error.response.data.message));
       }
     },
   });
@@ -78,7 +78,7 @@ const CreateAccount = () => {
         }}
       >
         <Typography variant="h1" textAlign={"center"}>
-          Sign up
+          Register
         </Typography>
         <Button
           variant="outlined"
@@ -135,6 +135,15 @@ const CreateAccount = () => {
             onChange={formik.handleChange}
             required
           />
+          {error && (
+            <Typography
+              variant="caption"
+              color={"error.main"}
+              textAlign={"center"}
+            >
+              {error}
+            </Typography>
+          )}
           <LoadingButton
             variant="contained"
             type="submit"
@@ -147,7 +156,7 @@ const CreateAccount = () => {
         <Typography textAlign={"center"}>
           Already signed up?{" "}
           <SpanForUserRegister onClick={() => navigate("/auth/login")}>
-            Go to sign in.
+            Go to Login.
           </SpanForUserRegister>
         </Typography>
       </Paper>
