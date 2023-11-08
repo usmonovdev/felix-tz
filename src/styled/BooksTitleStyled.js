@@ -4,29 +4,28 @@ import {
   outlinedInputClasses,
 } from "@mui/material";
 
-export const Span = styled("main")(({ theme }) => ({
+export const Span = styled("span")(({ theme }) => ({
   color: theme.palette.primary.main,
   display: "inline",
 }));
 
 export const SearchInput = styled(OutlinedInput)(({ theme }) => ({
   width: "300px",
+  backgroundColor: theme.palette.background.paper,
   "@media(max-width: 600px)": {
     width: "100%",
-    backgroundColor: theme.palette.secondary.alpha12,
   },
-  color: "white",
+  border: `2px solid ${theme.palette.action.hover}`,
+  color: theme.palette.common.black,
   borderRadius: "4px",
   "input::placeholder": {
-    opacity: "10%",
+    opacity: "70%",
   },
   input: {
     padding: "10px",
   },
   "&:hover": {
-    "@media(max-width: 600px)": {
-      backgroundColor: theme.palette.secondary.alpha12,
-    },
+    backgroundColor: theme.palette.background.paper,
     [`& .${outlinedInputClasses.notchedOutline}`]: {
       border: "none",
     },
@@ -35,20 +34,31 @@ export const SearchInput = styled(OutlinedInput)(({ theme }) => ({
     border: "none",
   },
   [`&.${outlinedInputClasses.focused}`]: {
-    backgroundColor: theme.palette.secondary.alpha12,
+    backgroundColor: theme.palette.background.paper,
   },
 }));
 
 export const Ul = styled("ul")(({ theme }) => ({
   display: "flex",
   flexDirection: "row",
+  alignItems: 'center',
   gap: "20px",
+  "@media(max-width: 600px)": {
+    flexDirection: 'column',
+    alignItems: 'start',
+    gap: '10px',
+    width: '100%'
+  },
 }));
 
-export const NavbarBig = styled("nav")(({ theme }) => ({
-  height: "80px",
-  width: "100%",
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-}));
+export const Section = styled('section')(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  "@media(max-width: 900px)": {
+    flexDirection: 'column',
+    alignItems: 'start',
+    gap: '20px'
+  },
+}))

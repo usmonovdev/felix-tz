@@ -6,7 +6,11 @@ export const MainTagForUserRegister = styled('main')({
   height: '100vh',
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'center'
+  justifyContent: 'center',
+  "@media(max-width: 600px)": {
+    width: '90%',
+    margin: '0 auto'
+  },
 })
 
 export const DividerForUserRegister = styled(Divider)(({ theme }) => ({

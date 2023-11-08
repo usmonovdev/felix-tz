@@ -21,8 +21,9 @@ import {
 
 const CreateAccount = () => {
   const dispatch = useDispatch();
-  const { loading, error } = useSelector((state) => state);
+  const { loading, error } = useSelector((state) => state.user);
   const navigate = useNavigate();
+  
   const formik = useFormik({
     initialValues: {
       name: "",

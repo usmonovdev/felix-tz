@@ -17,7 +17,7 @@ const ProtectedRoute = ({
 };
 
 function App() {
-  const { isLoggedIn } = useSelector((state) => state)
+  const { isLoggedIn } = useSelector((state) => state.user)
   return (
     <ThemeProvider theme={Theme}>
       <Routes>
