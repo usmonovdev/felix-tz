@@ -16,7 +16,11 @@ import { LoadingButton } from "@mui/lab";
 import { useFormik } from "formik";
 import { generateSign } from "../utils/signGenerate";
 import { useDispatch, useSelector } from "react-redux";
-import { addBooksOpen, getBooksSuccess } from "../store/books-slice";
+import {
+  addBookSuccess,
+  addBooksOpen,
+  getBooksSuccess,
+} from "../store/books-slice";
 import * as Yup from "yup";
 import axios from "../utils/axios.config";
 
@@ -87,11 +91,14 @@ const AddBook = () => {
             Sign: sign,
           },
         });
-        dispatch(getBooksSuccess([...books, response.data?.data]));
+        dispatch(
+          addBookSuccess(
+            books == null
+              ? response.data?.data
+              : [...books, response.data?.data]
+          )
+        );
         dispatch(addBooksOpen());
-        if (books.length == 0) {
-          window.location.reload()
-        }
         setIsLoading(false);
         setMessage(true);
         helpers.resetForm();

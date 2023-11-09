@@ -23,7 +23,7 @@ const CreateAccount = () => {
   const dispatch = useDispatch();
   const { loading, error } = useSelector((state) => state.user);
   const navigate = useNavigate();
-  
+
   const formik = useFormik({
     initialValues: {
       name: "",
@@ -59,6 +59,7 @@ const CreateAccount = () => {
           dispatch(registerUserSuccess(data.data));
           navigate("/");
           helpers.resetForm();
+          // window.location.reload();
         }
       } catch (error) {
         dispatch(registerUserError(error.response.data.message));

@@ -1,23 +1,23 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "@emotion/styled";
 import {
   Box,
   Modal,
   Typography,
   IconButton,
-  TextField,
   Button,
   Snackbar,
   Alert,
+  Radio,
+  RadioGroup,
+  FormControlLabel,
+  FormControl,
 } from "@mui/material";
 import { IconCloseModal } from "../icons";
-import { FormForUserRegister } from "../styled/StyledTags";
 import { LoadingButton } from "@mui/lab";
-import { useFormik } from "formik";
 import { generateSign } from "../utils/signGenerate";
 import { useDispatch, useSelector } from "react-redux";
-import { addBooksOpen, editBooksClose, getBooksSuccess } from "../store/books-slice";
-import * as Yup from "yup";
+import { editBooksClose } from "../store/books-slice";
 import axios from "../utils/axios.config";
 
 const Style = styled(Box)(({ theme }) => ({
@@ -36,71 +36,75 @@ const Style = styled(Box)(({ theme }) => ({
   borderRadius: "12px",
 }));
 
+const statuses = ["New", "Reading", "Finished"];
+
 const EditBook = () => {
+  const { editBooks, editBooksData } = useSelector((state) => state.books);
+
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(null);
   const [message, setMessage] = useState(false);
-  const { books, editBooks } = useSelector((state) => state.books);
+  const [selectedStatus, setSelectedStatus] = useState();
+  const [selectedStatusNum, setSelectedStatusNum] = useState(0);
   const dispatch = useDispatch();
 
-  const formik = useFormik({
-    initialValues: {
-      title: "",
-      author: "",
-      published: "",
-      pages: "",
-      isbn: "",
-    },
-    validationSchema: Yup.object({
-      title: Yup.string()
-        .min(5, "Min length is 5")
-        .max(30, "Max length is 30")
-        .required("Title is required"),
+  useEffect(() => {
+    if (editBooksData.status == 0) {
+      setSelectedStatus(statuses[0]);
+    }
+    if (editBooksData.status == 1) {
+      setSelectedStatus(statuses[1]);
+    }
+    if (editBooksData.status == 2) {
+      setSelectedStatus(statuses[2]);
+    }
+  }, [editBooksData]);
 
-      author: Yup.string()
-        .min(6, "Min length is 6")
-        .max(25, "Max length is 25")
-        .required("Author is required"),
+  useEffect(() => {
+    if (selectedStatus == statuses[0]) {
+      setSelectedStatusNum(0);
+    }
+    if (selectedStatus == statuses[1]) {
+      setSelectedStatusNum(1);
+    }
+    if (selectedStatus == statuses[2]) {
+      setSelectedStatusNum(2);
+    }
+  }, [selectedStatus]);
 
-      published: Yup.number().required("Published is required"),
-
-      pages: Yup.number().required("Pages is required"),
-
-      isbn: Yup.string().required("ISBN is required"),
-    }),
-    onSubmit: async (values, helpers) => {
-      const key = localStorage.getItem("key");
-      setIsLoading(true);
-      const body = {
-        title: values.title,
-        cover: "http://url.to.book.cover",
-        author: values.author,
-        published: values.published,
-        pages: values.pages,
-        isbn: values.isbn,
-      };
-      const sign = generateSign("POST", body, "/books");
-      try {
-        const response = await axios.post("/books", body, {
+  const handleChangeStatus = async () => {
+    setIsLoading(true);
+    const key = localStorage.getItem("key");
+    const body = {
+      status: selectedStatusNum,
+    };
+    const sign = generateSign(
+      "PATCH",
+      body,
+      `/books/${editBooksData?.book?.id}`
+    );
+    try {
+      const { data } = await axios.patch(
+        `/books/${editBooksData?.book?.id}`,
+        body,
+        {
           headers: {
             Key: key,
             Sign: sign,
           },
-        });
-        dispatch(getBooksSuccess([...books, response.data?.data]));
-        dispatch(addBooksOpen());
-        if (books.length == 0) {
-          window.location.reload()
         }
+      );
+      if (data.isOk == true) {
+        dispatch(editBooksClose());
+        setIsError(null);
         setIsLoading(false);
-        setMessage(true);
-        helpers.resetForm();
-      } catch (error) {
-        setIsLoading(false);
-        setIsError(error?.response?.data?.message);
       }
-    },
-  });
+      setIsLoading(false);
+    } catch (error) {
+      setIsError(error.response?.data?.message);
+      setIsLoading(false);
+    }
+  };
 
   const handleCloseMessage = (event, reason) => {
     if (reason === "clickaway") {
@@ -113,7 +117,6 @@ const EditBook = () => {
   const handleClose = () => {
     dispatch(editBooksClose());
     setIsError(null);
-    formik.resetForm();
   };
 
   return (
@@ -150,62 +153,31 @@ const EditBook = () => {
               <IconCloseModal />
             </IconButton>
           </Box>
-          <FormForUserRegister noValidate onSubmit={formik.handleSubmit}>
-            <TextField
-              id="title"
-              label="Title"
-              type="text"
-              helperText={formik.touched.title && formik.errors.title}
-              error={!!(formik.touched.title && formik.errors.title)}
-              onBlur={formik.handleBlur}
-              onChange={formik.handleChange}
-              value={formik.values.title}
-              required
-            />
-            <TextField
-              id="author"
-              label="Author"
-              type="text"
-              helperText={formik.touched.author && formik.errors.author}
-              error={!!(formik.touched.author && formik.errors.author)}
-              onBlur={formik.handleBlur}
-              onChange={formik.handleChange}
-              value={formik.values.author}
-              required
-            />
-            <TextField
-              id="published"
-              label="Published (Year)"
-              type="number"
-              helperText={formik.touched.published && formik.errors.published}
-              error={!!(formik.touched.published && formik.errors.published)}
-              onBlur={formik.handleBlur}
-              onChange={formik.handleChange}
-              value={formik.values.published}
-              required
-            />
-            <TextField
-              id="pages"
-              label="Pages"
-              type="number"
-              helperText={formik.touched.pages && formik.errors.pages}
-              error={!!(formik.touched.pages && formik.errors.pages)}
-              onBlur={formik.handleBlur}
-              onChange={formik.handleChange}
-              value={formik.values.pages}
-              required
-            />
-            <TextField
-              id="isbn"
-              label="ISBN"
-              type="text"
-              helperText={formik.touched.isbn && formik.errors.isbn}
-              error={!!(formik.touched.isbn && formik.errors.isbn)}
-              onBlur={formik.handleBlur}
-              onChange={formik.handleChange}
-              value={formik.values.isbn}
-              required
-            />
+          <FormControl fullWidth noValidate>
+            <RadioGroup
+              name="statuses"
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+            >
+              <FormControlLabel
+                checked={selectedStatus == statuses[0]}
+                value={statuses[0]}
+                control={<Radio />}
+                label={statuses[0]}
+              />
+              <FormControlLabel
+                checked={selectedStatus == statuses[1]}
+                value={statuses[1]}
+                control={<Radio />}
+                label={statuses[1]}
+              />
+              <FormControlLabel
+                checked={selectedStatus == statuses[2]}
+                value={statuses[2]}
+                control={<Radio />}
+                label={statuses[2]}
+              />
+            </RadioGroup>
             {isError && (
               <Typography
                 variant="caption"
@@ -228,14 +200,14 @@ const EditBook = () => {
               </Button>
               <LoadingButton
                 variant="contained"
-                type="submit"
+                onClick={handleChangeStatus}
                 fullWidth
                 loading={isLoading}
               >
                 Add
               </LoadingButton>
             </Box>
-          </FormForUserRegister>
+          </FormControl>
         </Style>
       </Modal>
     </>

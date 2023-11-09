@@ -43,12 +43,21 @@ const Title = () => {
   return (
     <>
       <Section>
-        <Typography variant="h1" color={"white"} sx={{ '@media(max-width: 600px)': {
-          fontSize: '20px'
-        } }}>
+        <Typography
+          variant="h1"
+          color={"white"}
+          sx={{
+            "@media(max-width: 600px)": {
+              fontSize: "20px",
+            },
+          }}
+        >
           You’ve got{" "}
           <Span>
-            {books == null || books.length == 0 ? "0" : books.length} book
+            {books == null || books == undefined || books?.length == 0
+              ? "0"
+              : books?.length}{" "}
+            book
           </Span>{" "}
         </Typography>
         <Ul>

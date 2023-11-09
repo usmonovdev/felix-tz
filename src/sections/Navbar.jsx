@@ -1,12 +1,18 @@
 import React from "react";
-import { IconBell, IconLogo, IconSearch } from "../icons";
+import { IconLogOut, IconLogo, IconSearch } from "../icons";
 import { List } from "../styled/Main";
-import {
-  Typography
-} from "@mui/material";
+import { Typography } from "@mui/material";
 import { NavbarBig, SearchInput, Span, Ul } from "../styled/NavbarStyles";
+import { useNavigate } from "react-router-dom"
 
 const Navbar = () => {
+  const navigate = useNavigate()
+  const handleLogOut = () => {
+    localStorage.removeItem("key")
+    localStorage.removeItem("secret")
+    localStorage.removeItem("isLoggedIn")
+    navigate("/auth/login")
+  };
   return (
     <NavbarBig>
       <Ul
@@ -22,9 +28,6 @@ const Navbar = () => {
             flexDirection: "row",
             alignItems: "center",
             gap: "20px",
-            "@media(max-width: 600px)": {
-              display: "none",
-            },
           }}
         >
           <IconLogo />
@@ -32,30 +35,33 @@ const Navbar = () => {
             <Span>Books</Span> List
           </Typography>
         </List>
-        <List
-          sx={{
-            "@media(max-width: 600px)": {
-              width: "100%"
-            },
-          }}
-        >
+        <List>
           <SearchInput
             placeholder="Search for any training you want"
             startAdornment={<IconSearch />}
           />
         </List>
       </Ul>
-      <Ul
-        sx={{
-          "@media(max-width: 900px)": {
-            display: "none",
-          },
-        }}
-      >
-        <List sx={{ cursor: "pointer" }}>
-          <IconBell />
+      <Ul>
+        <List
+          onClick={handleLogOut}
+          sx={{
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <IconLogOut />
         </List>
-        <List>
+        <List
+          sx={{
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
           <img src="/src/images/profile_photo.png" alt="user" />
         </List>
       </Ul>

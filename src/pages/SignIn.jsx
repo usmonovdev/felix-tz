@@ -59,6 +59,7 @@ const SignIn = () => {
           dispatch(loginUserSuccess(data.data));
           navigate("/");
           helpers.resetForm();
+          // window.location.reload()
         }
       } catch (error) {
         dispatch(loginUserError(error.response.data.message));

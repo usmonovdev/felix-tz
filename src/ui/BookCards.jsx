@@ -1,11 +1,11 @@
 import React from "react";
 import { styled } from "@mui/system";
-import { Typography, Box, useTheme, Paper, IconButton } from "@mui/material";
+import { Typography, Box, useTheme, Paper } from "@mui/material";
 import { IconDelete, IconEdit } from "../icons";
-import axios from "../utils/axios.config";
 import { generateSign } from "../utils/signGenerate";
 import { useDispatch, useSelector } from "react-redux";
 import { editBooksOpen, getBooksSuccess } from "../store/books-slice";
+import axios from "../utils/axios.config";
 
 const Card = styled("div")(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
@@ -61,7 +61,8 @@ const EditButton = styled("button")(({ theme }) => ({
   boxShadow: theme.shadows[10],
 }));
 
-const BookCards = ({ book }) => {
+const BookCards = (props) => {
+  const book = props.book.book
   const theme = useTheme();
   const booksState = useSelector((state) => state.books);
   const dispatch = useDispatch();
@@ -89,6 +90,7 @@ const BookCards = ({ book }) => {
   const handleEditBook = (book) => {
     dispatch(editBooksOpen(book))
   }
+
 
   return (
     <Card>
@@ -139,7 +141,7 @@ const BookCards = ({ book }) => {
         </Typography>
       </Box>
       <BookEvents className="book-events">
-        <EditButton onClick={() => handleEditBook(book)}>
+        <EditButton onClick={() => handleEditBook(props.book)}>
           <IconEdit />
         </EditButton>
         <DeleteButton onClick={() => handleDeleteBook(book.id)}>

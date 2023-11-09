@@ -12,8 +12,7 @@ export const Span = styled("main")(({ theme }) => ({
 export const SearchInput = styled(OutlinedInput)(({ theme }) => ({
   width: "300px",
   "@media(max-width: 600px)": {
-    width: "100%",
-    backgroundColor: theme.palette.secondary.alpha12,
+    display: 'none'
   },
   color: "white",
   borderRadius: "4px",

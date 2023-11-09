@@ -1,8 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Typography, Grid, Box, CircularProgress } from "@mui/material";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { styled } from "@mui/system";
 import BookCards from "../../ui/BookCards";
+import { getBooksFail, getBooksStart, getBooksSuccess } from "../../store/books-slice";
+import { generateSign } from "../../utils/signGenerate";
+import axios from "../../utils/axios.config";
 
 const Section = styled("section")(({ theme }) => ({
   display: "flex",
@@ -11,7 +14,31 @@ const Section = styled("section")(({ theme }) => ({
 }));
 
 const Books = () => {
-  const { books, loading } = useSelector((state) => state.books);
+  const key = localStorage.getItem("key");
+  const sign = generateSign("GET", "", "/books");
+  const dispatch = useDispatch();
+  const { books, loading, addBooks, editBooks } = useSelector((state) => state.books);
+
+  const getBooks = async () => {
+    dispatch(getBooksStart());
+    try {
+      const { data } = await axios.get("/books", {
+        headers: {
+          Key: key,
+          Sign: sign,
+        },
+      });
+      if (data.isOk == true) {
+        dispatch(getBooksSuccess(data.data));
+      }
+    } catch (error) {
+      dispatch(getBooksFail(error.response?.data?.message));
+    }
+  };
+
+  useEffect(() => {
+    getBooks();
+  }, [addBooks, editBooks]);
 
   if (loading == true) {
     return (
@@ -64,13 +91,13 @@ const Books = () => {
         Your task today
       </Typography>
       <Grid container spacing={4} columns={{ xs: 4, sm: 8, md: 12 }}>
-        {books?.map((data) => {
+        {Array.isArray(books) ? books?.map((data) => {
           return (
             <Grid item xs={4} sm={4} md={4} key={data?.book?.isbn}>
-              <BookCards book={data.book == undefined ? data : data.book} />
+              <BookCards book={data} />
             </Grid>
           );
-        })}
+        }): null}
       </Grid>
     </Section>
   );

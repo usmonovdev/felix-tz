@@ -21,22 +21,25 @@ export const booksSlice = createSlice({
     },
     getBooksFail: (state, action) => {
       state.loading = false,
-      state.books = []
+        state.books = []
       state.error = action.payload
     },
     addBooksOpen: (state, action) => {
       state.addBooks = !state.addBooks
     },
+    addBookSuccess: (state, action) => {
+      state.books = action.payload
+    },
     editBooksOpen: (state, action) => {
       state.editBooks = true,
-      state.editBooksData = action.payload
+        state.editBooksData = action.payload
     },
     editBooksClose: (state, action) => {
       state.editBooks = false,
-      state.editBooksData = []
+        state.editBooksData = []
     }
   }
 })
 
-export const { getBooksStart, getBooksSuccess, getBooksFail, addBooksOpen, editBooksOpen, editBooksClose } = booksSlice.actions
+export const { getBooksStart, getBooksSuccess, getBooksFail, addBooksOpen, editBooksOpen, editBooksClose, addBookSuccess } = booksSlice.actions
 export default booksSlice.reducer
