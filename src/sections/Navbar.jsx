@@ -4,6 +4,7 @@ import { List } from "../styled/Main";
 import { Typography } from "@mui/material";
 import { NavbarBig, SearchInput, Span, Ul } from "../styled/NavbarStyles";
 import { useNavigate } from "react-router-dom"
+import user from "../images/profile_photo.png"
 
 const Navbar = () => {
   const navigate = useNavigate()
@@ -62,7 +63,7 @@ const Navbar = () => {
             justifyContent: "center",
           }}
         >
-          <img src="/src/images/profile_photo.png" alt="user" />
+          <img src={user} alt="user" />
         </List>
       </Ul>
     </NavbarBig>
