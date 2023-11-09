@@ -5,7 +5,10 @@ export const booksSlice = createSlice({
   initialState: {
     loading: false,
     error: null,
-    books: []
+    books: [],
+    addBooks: false,
+    editBooks: false,
+    editBooksData: []
   },
   reducers: {
     getBooksStart: (state, action) => {
@@ -20,9 +23,20 @@ export const booksSlice = createSlice({
       state.loading = false,
       state.books = []
       state.error = action.payload
+    },
+    addBooksOpen: (state, action) => {
+      state.addBooks = !state.addBooks
+    },
+    editBooksOpen: (state, action) => {
+      state.editBooks = true,
+      state.editBooksData = action.payload
+    },
+    editBooksClose: (state, action) => {
+      state.editBooks = false,
+      state.editBooksData = []
     }
   }
 })
 
-export const { getBooksStart, getBooksSuccess, getBooksFail } = booksSlice.actions
+export const { getBooksStart, getBooksSuccess, getBooksFail, addBooksOpen, editBooksOpen, editBooksClose } = booksSlice.actions
 export default booksSlice.reducer

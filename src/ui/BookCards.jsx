@@ -5,7 +5,7 @@ import { IconDelete, IconEdit } from "../icons";
 import axios from "../utils/axios.config";
 import { generateSign } from "../utils/signGenerate";
 import { useDispatch, useSelector } from "react-redux";
-import { getBooksSuccess } from "../store/books-slice";
+import { editBooksOpen, getBooksSuccess } from "../store/books-slice";
 
 const Card = styled("div")(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
@@ -71,7 +71,7 @@ const BookCards = ({ book }) => {
     const sign = generateSign("DELETE", "", `/books/${id}`);
     try {
       const books = booksState.books;
-      const filterBooks = books.filter((e) => e.book.id !== id);
+      const filterBooks = books.filter((e) => e.book?.id !== id);
       const { data } = await axios.delete(`/books/${id}`, {
         headers: {
           Key: key,
@@ -82,9 +82,13 @@ const BookCards = ({ book }) => {
         dispatch(getBooksSuccess(filterBooks));
       }
     } catch (error) {
-      console.log(error.response.data.message);
+      console.log(error);
     }
   };
+
+  const handleEditBook = (book) => {
+    dispatch(editBooksOpen(book))
+  }
 
   return (
     <Card>
@@ -135,7 +139,7 @@ const BookCards = ({ book }) => {
         </Typography>
       </Box>
       <BookEvents className="book-events">
-        <EditButton>
+        <EditButton onClick={() => handleEditBook(book)}>
           <IconEdit />
         </EditButton>
         <DeleteButton onClick={() => handleDeleteBook(book.id)}>

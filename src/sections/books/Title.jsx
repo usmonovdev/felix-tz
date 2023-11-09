@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Typography, Button } from "@mui/material";
 import { List } from "../../styled/Main";
 import { SearchInput, Section, Span, Ul } from "../../styled/BooksTitleStyled";
@@ -6,18 +6,17 @@ import { IconAdd } from "../../icons";
 import { generateSign } from "../../utils/signGenerate";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  addBooksOpen,
   getBooksFail,
   getBooksStart,
   getBooksSuccess,
 } from "../../store/books-slice";
-import { AddBookModal } from "../../ui";
 import axios from "../../utils/axios.config";
 
 const Title = () => {
   const key = localStorage.getItem("key");
   const sign = generateSign("GET", "", "/books");
   const { books } = useSelector((state) => state.books);
-  const [open, setOpen] = useState(false);
   const dispatch = useDispatch();
 
   const getBooks = async () => {
@@ -77,14 +76,13 @@ const Title = () => {
               variant="contained"
               fullWidth
               startIcon={<IconAdd />}
-              onClick={() => setOpen(!open)}
+              onClick={() => dispatch(addBooksOpen())}
             >
               Create a book
             </Button>
           </List>
         </Ul>
       </Section>
-      <AddBookModal open={open} setOpen={setOpen} />
     </>
   );
 };

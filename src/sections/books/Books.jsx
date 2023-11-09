@@ -1,8 +1,8 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Typography, Grid, Box, CircularProgress } from "@mui/material";
 import { useSelector } from "react-redux";
-import BookCards from "../../ui/BookCards";
 import { styled } from "@mui/system";
+import BookCards from "../../ui/BookCards";
 
 const Section = styled("section")(({ theme }) => ({
   display: "flex",
@@ -30,7 +30,7 @@ const Books = () => {
     );
   }
 
-  if (books.length == 0) {
+  if (books?.length == 0 || books == null) {
     return (
       <Box
         sx={{

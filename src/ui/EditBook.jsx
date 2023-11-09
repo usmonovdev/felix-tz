@@ -16,7 +16,7 @@ import { LoadingButton } from "@mui/lab";
 import { useFormik } from "formik";
 import { generateSign } from "../utils/signGenerate";
 import { useDispatch, useSelector } from "react-redux";
-import { addBooksOpen, getBooksSuccess } from "../store/books-slice";
+import { addBooksOpen, editBooksClose, getBooksSuccess } from "../store/books-slice";
 import * as Yup from "yup";
 import axios from "../utils/axios.config";
 
@@ -36,11 +36,11 @@ const Style = styled(Box)(({ theme }) => ({
   borderRadius: "12px",
 }));
 
-const AddBook = () => {
+const EditBook = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(null);
   const [message, setMessage] = useState(false);
-  const { books, addBooks } = useSelector((state) => state.books);
+  const { books, editBooks } = useSelector((state) => state.books);
   const dispatch = useDispatch();
 
   const formik = useFormik({
@@ -111,7 +111,7 @@ const AddBook = () => {
   };
 
   const handleClose = () => {
-    dispatch(addBooksOpen());
+    dispatch(editBooksClose());
     setIsError(null);
     formik.resetForm();
   };
@@ -122,17 +122,17 @@ const AddBook = () => {
         open={message}
         autoHideDuration={6000}
         onClose={handleCloseMessage}
-        message="Book added"
+        message="Book Status Edited!"
       >
         <Alert
           onClose={handleCloseMessage}
           severity="success"
           sx={{ width: "100%" }}
         >
-          Book Added!
+          Book Status Edited!
         </Alert>
       </Snackbar>
-      <Modal open={addBooks} onClose={handleClose}>
+      <Modal open={editBooks} onClose={handleClose}>
         <Style>
           <Box
             sx={{
@@ -144,7 +144,7 @@ const AddBook = () => {
             }}
           >
             <Typography id="modal-modal-title" variant="h6" component="h2">
-              Create a book
+              Edit Book Status
             </Typography>
             <IconButton onClick={handleClose}>
               <IconCloseModal />
@@ -242,4 +242,4 @@ const AddBook = () => {
   );
 };
 
-export default AddBook;
+export default EditBook;
