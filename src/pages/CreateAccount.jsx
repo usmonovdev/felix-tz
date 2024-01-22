@@ -49,12 +49,34 @@ const CreateAccount = () => {
     onSubmit: async (values, helpers) => {
       dispatch(registerUserStart());
       try {
-        const { data } = await axios.post("/signup", {
-          name: values.name,
-          email: values.email,
-          key: values.username,
-          secret: values.password,
+        // const { data } = await axios.post("/signup", {
+        //   name: values.name,
+        //   email: values.email,
+        //   key: values.username,
+        //   secret: values.password,
+        // });
+        const url = "https://0001.uz/signup";
+        const headers = {};
+
+        const body = JSON.stringify({
+          name: "Jackson",
+          email: "jackson@gmail.com",
+          key: "user900",
+          secret: "admindffds",
         });
+
+        fetch(url, {
+          method: "POST",
+          headers: headers,
+          body: body,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data);
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
         if (data.isOk == true) {
           dispatch(registerUserSuccess(data.data));
           navigate("/");
